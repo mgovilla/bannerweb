@@ -13,6 +13,7 @@ class _MyHomePageState extends State {
   String classes = "Loading...";
   List<String> choices = ['About', 'Log Out'];
   List<ScheduleElement> courses = List();
+  Map<String, int> dayMap = {"M": 0, "T": 1, "W": 2, "R": 3, "F": 4};
 
   _getClasses() async {
     API.getClasses(user, pin, '202001').then((response) {
@@ -61,36 +62,74 @@ class _MyHomePageState extends State {
 
   void _infoDialog(ScheduleElement course) {
     showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: Text(course.title),
-        );
-      }
-    );
-
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Text(course.title),
+          );
+        });
   }
 
   Widget scheduleView() {
     List<ScheduleElement> curCourses = List();
-    List<RaisedButton> courseNames = List();
+    List<List<MaterialButton>> daySched = List(5);
+    // Initialize Array
+    for(int i = 0; i < 5; i++) {
+      daySched[i] = List<MaterialButton>();
+    }
+    List<Column> days = List(5); // Mon, Tue...
+
     // Determine which classes are applicable
     for (ScheduleElement course in courses) {
       if (course.start.compareTo(now) <= 0 && course.end.compareTo(now) >= 0) {
         // TODO: check with real date
-        curCourses.add(course);
-        courseNames.add(RaisedButton(
-          onPressed: () => _infoDialog(course),
-          child: Text(course.toString()),
-        ));
+        curCourses.add(course); // Unused
+  
+        List<String> activeDays = course.days.split("");
+        String btnText = course.courseNum.split(" ")[0] + course.courseNum.split(" ")[1] + "\n" + course.classType + "\n" + course.crn;
+        for (String d in activeDays) {
+          int index = dayMap[d];
+          daySched[index].add(MaterialButton(
+            minWidth: MediaQuery.of(context).size.width / 6,
+            height: 45,
+            padding: EdgeInsets.all(5),
+            color: Colors.amber,
+            onPressed: () =>_infoDialog(course),
+            child: Text(
+              btnText,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.red
+                
+              ),
+            ),
+          ));
+        }
       }
+    }
+
+    for(int i = 0; i < 5; i++) { // Make sure Magic Wednesday isn't null
+      days[i] = Column(
+        children: daySched[i],
+      );
     }
 
     // Using current Courses, create the visual schedule
     // For each class
     return RefreshIndicator(
       child: ListView(
-        children: courseNames,
+        children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width,
+            child: Container(
+              child: Row(
+                children: days,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                ),
+            ),
+          )
+        ],
       ),
       onRefresh: _update,
     );

@@ -61,11 +61,13 @@ class ScheduleElement extends Object {
     this.courseNum = courseNum;
     this.instructor = instructor;
     this.location = location;
+    this.crn = crn;
 
     this.start = start;
     this.end = end;
     this.startTime = startTime;
     this.endTime = endTime;
+    this.days = days;
   }
 
   @override
