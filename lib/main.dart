@@ -11,11 +11,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'My Http App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
       home: LoginPage(),
       routes: {
-        '/home_page' : (context) => HomeScreen(),
+        '/home_page' : (context) => HomePage(),
         '/login_page': (context) => LoginPage(),
         //'/info_page': (context) => InfoPage(),
 

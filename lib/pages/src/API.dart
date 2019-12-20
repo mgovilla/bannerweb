@@ -7,6 +7,9 @@ const baseURL = 'https://bannerweb.wpi.edu';
 const url = 'https://bannerweb.wpi.edu/pls/prod/twbkwbis.P_ValLogin';
 const detlURL = 'https://bannerweb.wpi.edu/pls/prod/bwskfshd.P_CrseSchdDetl';
 
+String user = "mmgovilla";
+String pin = "Gatheringhill51";
+
 class API {
   
   static Future<List> getClasses(String user, String pin, String term) async {

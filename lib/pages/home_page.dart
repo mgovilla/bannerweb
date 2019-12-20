@@ -1,34 +1,37 @@
 import 'src/API.dart';
 import 'package:flutter/material.dart';
+import 'src/Schedule.dart';
 
-class HomeScreen extends StatefulWidget {
+DateTime now = DateTime.utc(2019, 11, 12);
+
+class HomePage extends StatefulWidget {
   @override
-  createState() => _MyHomeScreenState();
+  createState() => _MyHomePageState();
 }
 
-class _MyHomeScreenState extends State {
+class _MyHomePageState extends State {
   String classes = "Loading...";
-  String user = '235648495';
-  String pin = 'Gathering51';
-  List<String> choices = ['Change Login Credentials'];
+  List<String> choices = ['About', 'Log Out'];
+  List<ScheduleElement> courses = List();
 
-  _getClasses() {
-
+  _getClasses() async {
     API.getClasses(user, pin, '202001').then((response) {
       setState(() {
-        
-        classes = ""; 
-        for(var s in response) {
+        classes = "";
+        for (var s in response) {
           classes += s.toString() + "\n";
         }
-        if(classes == "") {
+        if (classes == "") {
           classes = "Incorrect Credentials";
+        } else {
+          classes = "";
+          courses = response;
         }
       });
     });
   }
 
-  _update() {
+  Future<void> _update() async {
     print('Get Again');
     _getClasses();
   }
@@ -42,57 +45,13 @@ class _MyHomeScreenState extends State {
     super.dispose();
   }
 
-  TextEditingController _userController = TextEditingController();
-  TextEditingController _pinController = TextEditingController();
-  _displayDialog(BuildContext context) {
-    _userController.clear();
-    _pinController.clear();
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Enter Login Credentials'),
-            content: Container(
-              child: Wrap(
-                children: <Widget>[
-                  TextField(
-                    controller: _userController,
-                    decoration: InputDecoration(hintText: "Username"),
-                  ),
-                  TextField(
-                    controller: _pinController,
-                    decoration: InputDecoration(hintText: "PIN"),
-                    obscureText: true,
-                    
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: new Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text('ENTER'),
-                onPressed: () {
-                  user = _userController.text;
-                  pin = _pinController.text;
-                  Navigator.of(context).pop();
-                  _update();
-                },
-              )
-            ],
-          );
-        });
-  }
-
   void choiceAction(String selection) {
     switch (selection) {
-      case "Change Login Credentials":
-        _displayDialog(context);
+      case "Log Out":
+        print("Log Out");
+        Navigator.pushNamed(context, "/login_page");
+        break;
+      case "About":
         break;
       default:
         print('default');
@@ -100,15 +59,52 @@ class _MyHomeScreenState extends State {
     }
   }
 
+  void _infoDialog(ScheduleElement course) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Text(course.title),
+        );
+      }
+    );
+
+  }
+
+  Widget scheduleView() {
+    List<ScheduleElement> curCourses = List();
+    List<RaisedButton> courseNames = List();
+    // Determine which classes are applicable
+    for (ScheduleElement course in courses) {
+      if (course.start.compareTo(now) <= 0 && course.end.compareTo(now) >= 0) {
+        // TODO: check with real date
+        curCourses.add(course);
+        courseNames.add(RaisedButton(
+          onPressed: () => _infoDialog(course),
+          child: Text(course.toString()),
+        ));
+      }
+    }
+
+    // Using current Courses, create the visual schedule
+    // For each class
+    return RefreshIndicator(
+      child: ListView(
+        children: courseNames,
+      ),
+      onRefresh: _update,
+    );
+  }
+
   @override
   build(context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("HTTP Response"),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
+      appBar: AppBar(
+        title: Text("Your Schedule"),
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: choiceAction,
+            itemBuilder: (BuildContext context) {
               return choices.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
@@ -116,24 +112,19 @@ class _MyHomeScreenState extends State {
                 );
               }).toList();
             },
-            ),
-          ],
-        ),
-        body: Container(
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: new SingleChildScrollView(
-                  child: new Text(classes)
-                ),
-              ),
-            ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _update,
-          child: Icon(Icons.add),
-        ),
-        );
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Container(
+            child: scheduleView(),
+            height: MediaQuery.of(context).size.height / 1.75,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            color: Colors.white,
+          ),
+        ],
+      ),
+    );
   }
 }

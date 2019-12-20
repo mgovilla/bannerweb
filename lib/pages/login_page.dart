@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'src/API.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -14,13 +15,13 @@ class _MyLoginPageState extends State {
   @override
   Widget build(BuildContext context) {
     
-    final emailField = TextField(
+    final userField = TextField(
       obscureText: false,
       controller: _userController,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Email",
+          hintText: "Username",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
@@ -61,12 +62,12 @@ class _MyLoginPageState extends State {
                 SizedBox(
                   height: 250.0,
                   child: Image.asset(
-                    "images/logo.png",
+                    "images/logo.png", // Takes a long time to load for some reason (large?)
                     fit: BoxFit.contain,
                   ),
                 ),
                 SizedBox(height: 40.0),
-                emailField,
+                userField,
                 SizedBox(height: 25.0),
                 passwordField,
                 SizedBox(height: 35.0),
@@ -81,6 +82,11 @@ class _MyLoginPageState extends State {
   }
 
   void submitCredentials() {
-    print("USER: ${_userController.text} \t PIN: ${_pinController.text}");
+    user = _userController.text;
+    pin = _pinController.text;
+
+    print("USER: ${user} \t PIN: ${pin}");
+
+    Navigator.pushNamed(context, "/home_page");
   }
 }
