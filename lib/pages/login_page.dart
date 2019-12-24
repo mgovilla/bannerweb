@@ -85,7 +85,7 @@ class _MyLoginPageState extends State {
     user = _userController.text;
     pin = _pinController.text;
 
-    print("USER: ${user} \t PIN: ${pin}");
+    print("USER: $user \t PIN: $pin");
 
     Navigator.pushNamed(context, "/home_page");
   }
