@@ -2,7 +2,7 @@ import 'src/API.dart';
 import 'package:flutter/material.dart';
 import 'src/Schedule.dart';
 
-DateTime now = DateTime.utc(2019, 11, 12);
+DateTime now = DateTime.utc(2020, 2, 12);
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,14 +20,16 @@ class _MyHomePageState extends State {
   TextStyle schStyle = TextStyle(fontSize: 10, color: Colors.red);
 
   _getClasses() async {
-    API.getClasses(user, pin, '202001').then((response) {
+    API.getClasses(user, pin, '202002').then((response) {
+      // TODO: Change to current ^ term
       setState(() {
         classes = "";
         for (var s in response) {
           classes += s.toString() + "\n";
         }
+        print(classes);
         if (classes == "") {
-          classes = "Incorrect Credentials";
+          classes = "Incorrect Credentials"; // TODO: Move to login page before login is allowed
         } else {
           classes = "";
           courses = response;
@@ -37,7 +39,6 @@ class _MyHomePageState extends State {
   }
 
   Future<void> _update() async {
-    print('Get Again');
     _getClasses();
   }
 
@@ -54,7 +55,8 @@ class _MyHomePageState extends State {
     switch (selection) {
       case "Log Out":
         print("Log Out");
-        Navigator.pushNamed(context, "/login_page");
+        storage.deleteAll();
+        Navigator.popAndPushNamed(context, "/login_page");
         break;
       case "About":
         break;
@@ -69,7 +71,7 @@ class _MyHomePageState extends State {
         context: context,
         builder: (context) {
           return Dialog(
-            child: Text(course.title),
+            child: Text(course.location, textAlign: TextAlign.center,),
           );
         });
   }
@@ -107,6 +109,7 @@ class _MyHomePageState extends State {
     // Determine which classes are applicable
     for (ScheduleElement course in courses) {
       if (course.start.compareTo(now) <= 0 && course.end.compareTo(now) >= 0) {
+       
         // TODO: check with real date
         curCourses.add(course); // Unused
 
@@ -185,7 +188,7 @@ class _MyHomePageState extends State {
 
   @override
   build(context) {
-    block = MediaQuery.of(context).size.height / 16;
+    block = MediaQuery.of(context).size.height / 14;
 
     return Scaffold(
       appBar: AppBar(
