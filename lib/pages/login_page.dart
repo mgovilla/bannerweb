@@ -11,6 +11,7 @@ class _MyLoginPageState extends State {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   TextEditingController _userController = TextEditingController();
   TextEditingController _pinController = TextEditingController();
+  bool _rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,17 @@ class _MyLoginPageState extends State {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+    final rememberMe = CheckboxListTile(
+        checkColor: Color(0xffc41230),
+        controlAffinity: ListTileControlAffinity.leading,
+        value: _rememberMe,
+        onChanged: (newValue){
+          setState(() {
+            _rememberMe = newValue;
+          });
+        },
+        title: Text("Remember me", style: style,),
+      );
 
     return Scaffold(
       body: Center(
@@ -70,9 +82,11 @@ class _MyLoginPageState extends State {
                 userField,
                 SizedBox(height: 25.0),
                 passwordField,
-                SizedBox(height: 35.0),
+                SizedBox(height: 10.0),
+                rememberMe,
+                SizedBox(height: 25.0),
                 loginButon,
-                SizedBox(height: 15.0),
+                SizedBox(height: 10.0),
               ],
             ),
           ),
@@ -84,9 +98,13 @@ class _MyLoginPageState extends State {
   void submitCredentials() {
     user = _userController.text;
     pin = _pinController.text;
-
-    print("USER: $user \t PIN: $pin");
-
-    Navigator.pushNamed(context, "/home_page");
+    
+    if(_rememberMe) {
+      storage.write(key: "user", value:user);
+      storage.write(key: "pin", value:pin);
+    }
+    
+    
+    Navigator.popAndPushNamed(context, "/home_page");
   }
 }
