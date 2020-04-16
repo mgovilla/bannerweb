@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 import 'Schedule.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const baseURL = 'https://bannerweb.wpi.edu';
 const url = 'https://bannerweb.wpi.edu/pls/prod/twbkwbis.P_ValLogin';
 const detlURL = 'https://bannerweb.wpi.edu/pls/prod/bwskfshd.P_CrseSchdDetl';
 
-String user = "mmgovilla";
-String pin = "Gatheringhill51";
+final storage = new FlutterSecureStorage();
+
+String user;
+String pin;
 
 class API {
   
